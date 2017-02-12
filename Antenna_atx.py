@@ -22,6 +22,11 @@ QZSS=4
 SBAS=5
 IRNSS=6
 
+L1=1
+L2=2
+
+NO_AZ=-99
+
 In_Antenna=False
 In_APC_Offsets=False
 
@@ -205,7 +210,7 @@ def create_az_plot (Antenna,Band,Az_Elev_Correction):
       Elev_Labels.append(Item[0])
 
    for Az in sorted(Az_Elev_Correction):
-     if Az !=-99:
+     if Az !=NO_AZ:
        values=[]
        for Item in Az_Elev_Correction[Az]:
           values.append(Item[1])
@@ -225,7 +230,7 @@ def create_plot_radial(Antenna,Band,Az_Elev_Correction):
 
    Az_Labels=[]
    for Az in sorted(Az_Elev_Correction): 
-    if Az !=-99:
+    if Az !=NO_AZ:
       Az_Labels.append(Az)
 
    Elev_Labels=[]
@@ -234,7 +239,7 @@ def create_plot_radial(Antenna,Band,Az_Elev_Correction):
 
    Bias_values=[]
    for Az in sorted(Az_Elev_Correction):
-     if Az !=-99 :
+     if Az !=NO_AZ :
        for Item in Az_Elev_Correction[Az]:
           Bias_values.append(Item[1])
 
@@ -292,10 +297,10 @@ for line in fileinput.input():
           GPS_Offsets=len(APC_Offsets[0])
 #          print "  GPS Offsets: {}".format(GPS_Offsets)
           if 1 in APC_Offsets[0]:
-            GPS_L1_Offsets=len(APC_Offsets[0][1])
+            GPS_L1_Offsets=len(APC_Offsets[GPS][L1])
 #            print "    GPS L1 Offsets: {}".format(GPS_L1_Offsets)
           if 2 in APC_Offsets[0]:
-            GPS_L2_Offsets=len(APC_Offsets[0][2])
+            GPS_L2_Offsets=len(APC_Offsets[GPS][L2])
 #            print "    GPS L2 Offsets: {}".format(GPS_L2_Offsets)
 
 
@@ -303,10 +308,10 @@ for line in fileinput.input():
           GLO_Offsets=len(APC_Offsets[1])
 #          print "  GLO Offsets: {}".format(GLO_Offsets)
           if 1 in APC_Offsets[1]:
-            GLO_L1_Offsets=len(APC_Offsets[1][1])
+            GLO_L1_Offsets=len(APC_Offsets[GLONASS][L1])
 #            print "    GLO L1 Offsets: {}".format(GLO_L1_Offsets)
           if 2 in APC_Offsets[1]:
-            GLO_L2_Offsets=len(APC_Offsets[1][2])
+            GLO_L2_Offsets=len(APC_Offsets[GLONASS][L2])
 #            print "    GLO L2 Offsets: {}".format(GLO_L2_Offsets)
 
 
@@ -321,9 +326,9 @@ for line in fileinput.input():
 
         if GPS_L1_Offsets!=None:
           if GPS_L2_Offsets:
-              plot_name=create_mean_plot (Type,"GPS",APC_Offsets[0][1][-99],APC_Offsets[0][2][-99])
+              plot_name=create_mean_plot (Type,"GPS",APC_Offsets[GPS][L1][NO_AZ],APC_Offsets[GPS][L2][NO_AZ])
           else:
-              plot_name=create_mean_plot (Type,"GPS",APC_Offsets[0][1][-99],None)
+              plot_name=create_mean_plot (Type,"GPS",APC_Offsets[GPS][L1][NO_AZ],None)
 
         if GPS_L1_Offsets==1:
           GPS_L1_Offsets_Txt='<a target="_blank" href="'+plot_name+'">Mean</a>'
@@ -338,22 +343,24 @@ for line in fileinput.input():
           Az_html_file.write('<h1>Antenna information for {}</h1>'.format(Type))
           Az_html_file.write("\n")
           if GPS_L2_Offsets:
+             Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-Mean","GPS Mean"))
+             Az_html_file.write('<img src="'+plot_name+'" alt="GPS Mean">')
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L1","GPS L1"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[0][1]),Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[0][1]),"Radial " + Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L2","GPS L2"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L2",APC_Offsets[0][1]),Type+" GPS-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L2",APC_Offsets[GPS][L2]),Type+" GPS-L2"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L2",APC_Offsets[0][2]),"Radial " + Type+" GPS-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L2",APC_Offsets[GPS][L2]),"Radial " + Type+" GPS-L2"))
              Az_html_file.write("\n")
 
           else:
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L1","GPS L1"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[0][1]),Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[0][1]),"Radial " + Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
              Az_html_file.write("\n")
 
 
@@ -362,7 +369,7 @@ for line in fileinput.input():
         if GPS_L2_Offsets==1: #this has a bug if there is Az dependent L1 and Mean L2
           GPS_L2_Offsets_Txt='<a target="_blank" href="'+plot_name+'">Mean</a>'
           try:
-            create_single_plot (Type,"GPS-L2",APC_Offsets[0][2][-99])
+            create_single_plot (Type,"GPS-L2",APC_Offsets[GPS][L2][NO_AZ])
           except:
             pass
         elif GPS_L2_Offsets>1:
@@ -372,12 +379,12 @@ for line in fileinput.input():
         if GLO_L1_Offsets!=None:
           if GLO_L2_Offsets:
             try:
-              create_mean_plot (Type,"GLO",APC_Offsets[1][1][-99],APC_Offsets[1][2][-99])
+              create_mean_plot (Type,"GLO",APC_Offsets[GLONASS][L1][NO_AZ],APC_Offsets[GLONASS][L2][NO_AZ])
             except:
               pass
           else:
             try:
-              create_mean_plot (Type,"GLO",APC_Offsets[1][1][-99],None)
+              create_mean_plot (Type,"GLO",APC_Offsets[GLONASS][L1][NO_AZ],None)
             except:
               pass
 
@@ -387,7 +394,7 @@ for line in fileinput.input():
         if GLO_L1_Offsets==1:
           GLO_L1_Offsets_Txt="Mean"
           try:
-            create_single_plot (Type,"GLO",APC_Offsets[1][1][-99])
+            create_single_plot (Type,"GLO",APC_Offsets[GLONASS][L1][NO_AZ])
           except:
             pass
         elif GLO_L1_Offsets>1:
@@ -399,7 +406,7 @@ for line in fileinput.input():
         if GLO_L2_Offsets==1:
           GLO_L2_Offsets_Txt="Mean"
           try:
-            create_single_plot (Type,"GLO-L2",APC_Offsets[1][2][-99])
+            create_single_plot (Type,"GLO-L2",APC_Offsets[GLONASS][L2][NO_AZ])
           except:
             pass
         elif GLO_L2_Offsets>1:
@@ -407,22 +414,24 @@ for line in fileinput.input():
           GLO_L2_Offsets_Txt='<a target="_blank" href="'+Az_filename+'#GLO-L2">Azimuth</a>'
           
           if GLO_L2_Offsets:
+             Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-Mean","GLO Mean"))
+             Az_html_file.write('<img src="'+plot_name+'" alt="GPS Mean">')
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L1","GLO L1"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[1][1]),Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[1][1]),"Radial " + Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L2","GLO L2"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L2",APC_Offsets[1][1]),Type+" GLO-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L2",APC_Offsets[GLONASS][L2]),Type+" GLO-L2"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L2",APC_Offsets[1][2]),"Radial " + Type+" GLO-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L2",APC_Offsets[GLONASS][L2]),"Radial " + Type+" GLO-L2"))
              Az_html_file.write("\n")
 
           else:
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L1","GLO L1"))
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[1][1]),Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[1][1]),"Radial " + Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
              Az_html_file.write("\n")
 
 
@@ -550,7 +559,7 @@ for line in fileinput.input():
     if In_APC_Offsets:
       Az=line[0:8]
       if Az== "   NOAZI":
-        Az=-99
+        Az=NO_AZ
       else:
         Az=float(Az)
       
@@ -591,7 +600,7 @@ for line in fileinput.input():
 
 HTML_Unit.output_table_footer(sys.stdout)
 
-HTML_Unit.output_html_footer(sys.stdout,["Antenna_Inforamation"])
+HTML_Unit.output_html_footer(sys.stdout,["Antenna_Information"])
 
 
     
