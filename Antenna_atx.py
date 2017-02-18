@@ -89,7 +89,7 @@ def safe_filename(filename):
   result = result.replace(' ',"_")
   return (result)
   
-def plot_polar_contour(Title,values, azimuths, zeniths):
+def plot_polar_contour(Title,values, azimuths, zeniths,range):
     """Plot a polar contour plot, with 0 degrees at the North.
 
     Arguments:
@@ -131,9 +131,10 @@ def plot_polar_contour(Title,values, azimuths, zeniths):
     ax.set_theta_zero_location("N")
     ax.set_theta_direction("clockwise")
     plt.title("Antenna Phase Biases: " + Title)
+#    plt.ylim(range)
 
     ax.set_rgrids([30,60],labels=["30","60"],angle=[0,0],fmt=None,visible=False)
-    cax = plt.contourf(theta, r, values, 30)
+    cax = plt.contourf(theta, r, values, 30, levels=range)
     cb = fig.colorbar(cax)
     cb.set_label("Bias (mm)")
 
@@ -144,26 +145,49 @@ def create_mean_plot (Antenna,Band,Elev_Correction_L1,Elev_Correction_L2):
    L1_values=[]
    L2_values=[]
    
+   Max_Correction=0
    for Item in Elev_Correction_L1:
 #      print day, Days_Since[day]
       Elev_Labels.append(Item[0])
-      L1_values.append(Item[1])
+#      L1_values.append(Item[1])
+      if abs(Item[1]) > Max_Correction:
+         Max_Correction=abs(Item[1])
+      L1_values.insert(0,Item[1])
+      
 
    if Elev_Correction_L2 != None:
      for Item in Elev_Correction_L2:
-        L2_values.append(Item[1])
+#        L2_values.append(Item[1])
+        L2_values.insert(0,Item[1])
+        if abs(Item[1]) > Max_Correction:
+           Max_Correction=abs(Item[1])
       
 #   plot_range=[x_values[0],x_values[len(x_values)-1]]
-   plot_range=[0,90]
       
    plt.figure(figsize=(8,6),dpi=100)
    plt.ylabel("Bias (mm)")
-   plt.xlabel("Elevation  (degrees)")
+   plt.xlabel("Elevation angle (degrees)")
    plt.suptitle(Antenna)
    plt.title("Antenna Phase Biases: " + Band)
    #plt.grid()
-   plt.xlim(plot_range)
    
+   xplot_range=[0,90]
+   plt.xlim(xplot_range)
+
+   if Max_Correction <= 5.0:
+      yplot_range=[-5,5]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 10.0:
+      yplot_range=[-10,10]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 15.0:
+      yplot_range=[-15,15]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 20.0:
+      yplot_range=[-20,20]
+      plt.ylim(yplot_range)
+   
+
 
    plt.plot(Elev_Labels,L1_values,label="L1" )
 
@@ -196,24 +220,51 @@ def create_az_plot (Antenna,Band,Az_Elev_Correction):
    L1_values=[]
    L2_values=[]
 
-   plot_range=[0,90]
       
    plt.figure(figsize=(8,6),dpi=100)
    plt.ylabel("Bias (mm)")
-   plt.xlabel("Elevation  (degrees)")
+   plt.xlabel("Elvation angle (degrees)")
    plt.suptitle(Antenna)
    plt.title("Antenna Phase Biases: " + Band)
    #plt.grid()
+   plot_range=[0,90]
    plt.xlim(plot_range)
  
    for Item in Az_Elev_Correction[0]:
       Elev_Labels.append(Item[0])
+#      Elev_Labels.insert(0,Item[0])
+
+   Max_Correction=0
+   for Az in sorted(Az_Elev_Correction):
+     if Az !=NO_AZ:
+       for Item in Az_Elev_Correction[Az]:
+#          values.append(Item[1])
+          if abs(Item[1]) > Max_Correction:
+             Max_Correction=abs(Item[1])
+   yplot_range=[-50,50]
+   if Max_Correction <= 5.0:
+      yplot_range=[-5,5]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 10.0:
+      yplot_range=[-10,10]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 15.0:
+      yplot_range=[-15,15]
+      plt.ylim(yplot_range)
+   elif Max_Correction <= 20.0:
+      yplot_range=[-20,20]
+      plt.ylim(yplot_range)
+       
 
    for Az in sorted(Az_Elev_Correction):
      if Az !=NO_AZ:
        values=[]
        for Item in Az_Elev_Correction[Az]:
-          values.append(Item[1])
+#          values.append(Item[1])
+          values.insert(0,Item[1])
+
+
+
        plt.plot(Elev_Labels,values,label=Band + "-" + str(Az))
    filename= safe_filename(Antenna)+"." + Band+'.AZ.png'
    try:
@@ -237,21 +288,40 @@ def create_plot_radial(Antenna,Band,Az_Elev_Correction):
    for Item in Az_Elev_Correction[0]:
       Elev_Labels.append(Item[0])
 
+
+   Max_Correction=0
    Bias_values=[]
    for Az in sorted(Az_Elev_Correction):
      if Az !=NO_AZ :
        for Item in Az_Elev_Correction[Az]:
           Bias_values.append(Item[1])
+#          Bias_values.insert(0,Item[1])
+
+          if abs(Item[1]) > Max_Correction:
+             Max_Correction=abs(Item[1])
+
+   yplot_range=range(-30,30,1)
+
+   if Max_Correction <= 5.0:
+      yplot_range=range(-5,5,1)
+   elif Max_Correction <= 10.0:
+      yplot_range=range(-10,10,1)
+   elif Max_Correction <= 15.0:
+      yplot_range=range(-15,15,1)
+   elif Max_Correction <= 20.0:
+      yplot_range=range(-20,20,1)
+       
+
 
 
 #   Elev_Reverse_Labels=[]
 #   for elev in xrange(Elev_Stop,Elev_Start-Elev_Step,-Elev_Step): #We need to make sure we get the last item in the list
 
-   Elev_Reverse_Labels=list(reversed(Elev_Labels))
+#   Elev_Reverse_Labels=list(reversed(Elev_Labels))
 
 #   print "Az {}: {}".format(len(Az_Labels),Az_Labels)
 #   print "Elev {}: {}".format(len(Elev_Reverse_Labels),Elev_Reverse_Labels)
-   plot_polar_contour(Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Reverse_Labels)
+   plot_polar_contour(Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
 
    filename= safe_filename(Antenna)+"." + Band+'.POLAR.png'
    try:
