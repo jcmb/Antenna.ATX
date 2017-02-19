@@ -346,16 +346,16 @@ def create_plot_radial(Antenna,Band,Az_Elev_Correction):
           if abs(Item[1]) > Max_Correction:
              Max_Correction=abs(Item[1])
 
-   yplot_range=range(-30,30,1)
+   yplot_range=range(-30,31,1)
 
    if Max_Correction <= 5.0:
-      yplot_range=range(-5,5,1)
+      yplot_range=range(-5,6,1)
    elif Max_Correction <= 10.0:
-      yplot_range=range(-10,10,1)
+      yplot_range=range(-10,11,1)
    elif Max_Correction <= 15.0:
-      yplot_range=range(-15,15,1)
+      yplot_range=range(-15,16,1)
    elif Max_Correction <= 20.0:
-      yplot_range=range(-20,20,1)
+      yplot_range=range(-20,21,1)
        
    plot_polar_contour("Antenna Phase Biases: " + Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
 
@@ -387,7 +387,7 @@ def create_plot_delta_radial(Antenna,Band,Az_Elev_Correction):
 
           Bias_values.append(item[1]-Az_Elev_Correction[NO_AZ][index][1])
 
-   yplot_range=range(-5,5,1)
+   yplot_range=range(-5,6,1)
        
    plot_polar_contour("Delta Antenna Phase Biases: " + Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
 
