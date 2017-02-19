@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import tempfile
 import base64
 
+#pprint=pprint.PrettyPrinter(stream=sys.stderr)
 
 from JCMBSoftPyLib import HTML_Unit
 
@@ -130,7 +131,7 @@ def plot_polar_contour(Title,values, azimuths, zeniths,range):
     fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
     ax.set_theta_zero_location("N")
     ax.set_theta_direction("clockwise")
-    plt.title("Antenna Phase Biases: " + Title)
+    plt.title(Title)
 #    plt.ylim(range)
 
     ax.set_rgrids([30,60],labels=["30","60"],angle=[0,0],fmt=None,visible=False)
@@ -276,6 +277,51 @@ def create_az_plot (Antenna,Band,Az_Elev_Correction):
 
    return(filename)
 
+def create_az_delta_plot (Antenna,Band,Az_Elev_Correction):
+
+   Elev_Labels=[]
+   L1_values=[]
+   L2_values=[]
+
+      
+   plt.figure(figsize=(8,6),dpi=100)
+   plt.ylabel("Bias from mean (mm)")
+   plt.xlabel("Elvation angle (degrees)")
+   plt.suptitle(Antenna)
+   plt.title("Delta Antenna Phase Biases: " + Band)
+   #plt.grid()
+   yplot_range=[-5,5]
+   plt.ylim(yplot_range)
+   plot_range=[0,90]
+   plt.xlim(plot_range)
+ 
+   for Item in Az_Elev_Correction[0]:
+      Elev_Labels.append(Item[0])
+#      Elev_Labels.insert(0,Item[0])
+
+       
+   for Az in sorted(Az_Elev_Correction):
+     if Az !=NO_AZ:
+       values=[]
+#       pprint (Az_Elev_Correction[Az],stream=sys.stderr)
+       for index, item in enumerate(Az_Elev_Correction[Az]):
+#          values.append(Item[1])
+          values.insert(0,item[1]-Az_Elev_Correction[NO_AZ][index][1])
+
+
+
+       plt.plot(Elev_Labels,values,label=Band + "-" + str(Az))
+   filename= safe_filename(Antenna)+"." + Band+'.AZ-Difference.png'
+   try:
+     plt.savefig(filename,format="png")
+   except:
+     filename="ERROR"
+
+   plt.close()
+
+   return(filename)
+
+
 
 def create_plot_radial(Antenna,Band,Az_Elev_Correction):
 
@@ -311,19 +357,41 @@ def create_plot_radial(Antenna,Band,Az_Elev_Correction):
    elif Max_Correction <= 20.0:
       yplot_range=range(-20,20,1)
        
-
-
-
-#   Elev_Reverse_Labels=[]
-#   for elev in xrange(Elev_Stop,Elev_Start-Elev_Step,-Elev_Step): #We need to make sure we get the last item in the list
-
-#   Elev_Reverse_Labels=list(reversed(Elev_Labels))
-
-#   print "Az {}: {}".format(len(Az_Labels),Az_Labels)
-#   print "Elev {}: {}".format(len(Elev_Reverse_Labels),Elev_Reverse_Labels)
-   plot_polar_contour(Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
+   plot_polar_contour("Antenna Phase Biases: " + Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
 
    filename= safe_filename(Antenna)+"." + Band+'.POLAR.png'
+   try:
+    plt.savefig(filename,format="png")
+   except:
+     filename="ERROR"
+   plt.close('all')
+
+   return (filename)
+
+
+def create_plot_delta_radial(Antenna,Band,Az_Elev_Correction):
+
+   Az_Labels=[]
+   for Az in sorted(Az_Elev_Correction): 
+    if Az !=NO_AZ:
+      Az_Labels.append(Az)
+
+   Elev_Labels=[]
+   for Item in Az_Elev_Correction[0]:
+      Elev_Labels.append(Item[0])
+
+   Bias_values=[]
+   for Az in sorted(Az_Elev_Correction):
+     if Az !=NO_AZ :
+       for index, item in enumerate(Az_Elev_Correction[Az]):
+
+          Bias_values.append(item[1]-Az_Elev_Correction[NO_AZ][index][1])
+
+   yplot_range=range(-5,5,1)
+       
+   plot_polar_contour("Delta Antenna Phase Biases: " + Antenna+' ' + Band,Bias_values, Az_Labels, Elev_Labels,yplot_range)
+
+   filename= safe_filename(Antenna)+"." + Band+'.POLAR-Difference.png'
    try:
     plt.savefig(filename,format="png")
    except:
@@ -417,20 +485,26 @@ for line in fileinput.input():
              Az_html_file.write('<img src="'+plot_name+'" alt="GPS Mean">')
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L1","GPS L1"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L2","GPS L2"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L2",APC_Offsets[GPS][L2]),Type+" GPS-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GPS-L2",APC_Offsets[GPS][L2]),Type+" GPS-L2"))
              Az_html_file.write("\n")
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L2",APC_Offsets[GPS][L2]),"Radial " + Type+" GPS-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GPS-L2",APC_Offsets[GPS][L2]),"Radial " + Type+" GPS-L2"))
              Az_html_file.write("\n")
 
           else:
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GPS-L1","GPS L1"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GPS-L1",APC_Offsets[GPS][L1]),Type+" GPS-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GPS-L1",APC_Offsets[GPS][L1]),"Radial " + Type+" GPS-L1"))
              Az_html_file.write("\n")
 
 
@@ -488,20 +562,25 @@ for line in fileinput.input():
              Az_html_file.write('<img src="'+plot_name+'" alt="GPS Mean">')
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L1","GLO L1"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
              Az_html_file.write("\n")
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L2","GLO L2"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L2",APC_Offsets[GLONASS][L2]),Type+" GLO-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GLO-L2",APC_Offsets[GLONASS][L2]),Type+" GLO-L2"))
              Az_html_file.write("\n")
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L2",APC_Offsets[GLONASS][L2]),"Radial " + Type+" GLO-L2"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GLO-L2",APC_Offsets[GLONASS][L2]),"Radial " + Type+" GLO-L2"))
              Az_html_file.write("\n")
 
           else:
              Az_html_file.write('<h2><a name="{}">{}</h2>'.format("GLO-L1","GLO L1"))
              Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_az_delta_plot (Type,"GLO-L1",APC_Offsets[GLONASS][L1]),Type+" GLO-L1"))
              Az_html_file.write("\n")
-             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
+             Az_html_file.write('<br><img src="{}" alt="{}">'.format(create_plot_delta_radial(Type,"GLO-L1",APC_Offsets[GLONASS][L1]),"Radial " + Type+" GLO-L1"))
              Az_html_file.write("\n")
 
 
