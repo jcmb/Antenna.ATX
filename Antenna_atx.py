@@ -238,10 +238,10 @@ def create_mean_plot (Antenna,System,Elev_Corrections,Elev_Names):
             Max_Correction=abs(Item[1])
          Elev_values.insert(0,Item[1])
 
-      print(Elev_Names[Name_Index])
-      pprint(Elev_Labels)
-      print("Values")
-      pprint(Elev_values)
+#      print(Elev_Names[Name_Index])
+#      pprint(Elev_Labels)
+#      print("Values")
+#      pprint(Elev_values)
       plt.plot(Elev_Labels,Elev_values,label=Elev_Names[Name_Index])
       Name_Index+=1
 
@@ -464,87 +464,196 @@ def create_plot_delta_radial(Antenna,Band,Az_Elev_Correction):
    return (filename)
 
 def dump_NEE_Offsets(output_file,offsets):
-  pprint(offsets)
+#  pprint(offsets)
+#  Az_html_file.write('<div class="row">')
+#  Az_html_file.write('<div class="column">SV System')
+
+#  Az_html_file.write("<h2>SV System</h2><pre>")
+
   if GPS in offsets:
     Az_html_file.write("<h3>GPS</h3>")
     if L1 in offsets[GPS]:
-      Az_html_file.write("L1: N: {}  E: {} U: {}<br>".format(offsets[GPS][L1][N_Offset],offsets[GPS][L1][E_Offset],offsets[GPS][L1][U_Offset]))
+      Az_html_file.write("L1: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L1][N_Offset],offsets[GPS][L1][E_Offset],offsets[GPS][L1][U_Offset]))
 
     if L2 in offsets[GPS]:
-      Az_html_file.write("L2: N: {}  E: {} U: {}<br>".format(offsets[GPS][L2][N_Offset],offsets[GPS][L2][E_Offset],offsets[GPS][L2][U_Offset]))
+      Az_html_file.write("L2: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L2][N_Offset],offsets[GPS][L2][E_Offset],offsets[GPS][L2][U_Offset]))
 
     if L5 in offsets[GPS]:
-      Az_html_file.write("L5: N: {}  E: {} U: {}<br>".format(offsets[GPS][L5][N_Offset],offsets[GPS][L5][E_Offset],offsets[GPS][L5][U_Offset]))
+      Az_html_file.write("L5: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L5][N_Offset],offsets[GPS][L5][E_Offset],offsets[GPS][L5][U_Offset]))
 
   if GLONASS in offsets:
     Az_html_file.write("<h3>GLONASS</h3>")
     if L1 in offsets[GLONASS]:
-      Az_html_file.write("L1: N: {}  E: {} U: {}<br>".format(offsets[GLONASS][L1][N_Offset],offsets[GLONASS][L1][E_Offset],offsets[GLONASS][L1][U_Offset]))
+      Az_html_file.write("L1: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GLONASS][L1][N_Offset],offsets[GLONASS][L1][E_Offset],offsets[GLONASS][L1][U_Offset]))
 
     if L2 in offsets[GLONASS]:
-      Az_html_file.write("L2: N: {}  E: {} U: {}<br>".format(offsets[GLONASS][L2][N_Offset],offsets[GLONASS][L2][E_Offset],offsets[GLONASS][L2][U_Offset]))
+      Az_html_file.write("L2: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GLONASS][L2][N_Offset],offsets[GLONASS][L2][E_Offset],offsets[GLONASS][L2][U_Offset]))
 
 
   if GALILEO in offsets:
     Az_html_file.write("<h3>GALILEO</h3>")
     if E1 in offsets[GALILEO]:
-      Az_html_file.write("E1: N: {}  E: {} U: {}<br>".format(offsets[GALILEO][E1][N_Offset],offsets[GALILEO][E1][E_Offset],offsets[GALILEO][E1][U_Offset]))
+      Az_html_file.write("E1:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E1][N_Offset],offsets[GALILEO][E1][E_Offset],offsets[GALILEO][E1][U_Offset]))
 
     if E5a in offsets[GALILEO]:
-      Az_html_file.write("E5a: N: {}  E: {} U: {}<br>".format(offsets[GALILEO][E5a][N_Offset],offsets[GALILEO][E5a][E_Offset],offsets[GALILEO][E5a][U_Offset]))
+      Az_html_file.write("E5a: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5a][N_Offset],offsets[GALILEO][E5a][E_Offset],offsets[GALILEO][E5a][U_Offset]))
 
     if E5b in offsets[GALILEO]:
-      Az_html_file.write("E5b: N: {}  E: {} U: {}<br>".format(offsets[GALILEO][E5b][N_Offset],offsets[GALILEO][E5b][E_Offset],offsets[GALILEO][E5b][U_Offset]))
+      Az_html_file.write("E5b: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5b][N_Offset],offsets[GALILEO][E5b][E_Offset],offsets[GALILEO][E5b][U_Offset]))
 
     if E5 in offsets[GALILEO]:
-      Az_html_file.write("E5: N: {}  E: {} U: {}<br>".format(offsets[GALILEO][E5][N_Offset],offsets[GALILEO][E5][E_Offset],offsets[GALILEO][E5][U_Offset]))
+      Az_html_file.write("E5:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5][N_Offset],offsets[GALILEO][E5][E_Offset],offsets[GALILEO][E5][U_Offset]))
 
     if E6 in offsets[GALILEO]:
-      Az_html_file.write("E6: N: {}  E: {} U: {}<br>".format(offsets[GALILEO][E6][N_Offset],offsets[GALILEO][E6][E_Offset],offsets[GALILEO][E6][U_Offset]))
+      Az_html_file.write("E6:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E6][N_Offset],offsets[GALILEO][E6][E_Offset],offsets[GALILEO][E6][U_Offset]))
 
 
   if COMPASS in offsets:
     Az_html_file.write("<h3>BeiDou</h3>")
     if E1 in offsets[COMPASS]:
-      Az_html_file.write("E1: N: {}  E: {} U: {}<br>".format(offsets[COMPASS][E1][N_Offset],offsets[COMPASS][E1][E_Offset],offsets[COMPASS][E1][U_Offset]))
+      Az_html_file.write("E1:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E1][N_Offset],offsets[COMPASS][E1][E_Offset],offsets[COMPASS][E1][U_Offset]))
 
     if E2 in offsets[COMPASS]:
-      Az_html_file.write("E2: N: {}  E: {} U: {}<br>".format(offsets[COMPASS][E2][N_Offset],offsets[COMPASS][E2][E_Offset],offsets[COMPASS][E2][U_Offset]))
+      Az_html_file.write("E2:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E2][N_Offset],offsets[COMPASS][E2][E_Offset],offsets[COMPASS][E2][U_Offset]))
 
     if E5b in offsets[COMPASS]:
-      Az_html_file.write("E5b: N: {}  E: {} U: {}<br>".format(offsets[COMPASS][E5b][N_Offset],offsets[COMPASS][E5b][E_Offset],offsets[COMPASS][E5b][U_Offset]))
+      Az_html_file.write("E5b: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E5b][N_Offset],offsets[COMPASS][E5b][E_Offset],offsets[COMPASS][E5b][U_Offset]))
 
     if E6 in offsets[COMPASS]:
-      Az_html_file.write("E6: N: {}  E: {} U: {}<br>".format(offsets[COMPASS][E6][N_Offset],offsets[COMPASS][E6][E_Offset],offsets[COMPASS][E6][U_Offset]))
+      Az_html_file.write("E6:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E6][N_Offset],offsets[COMPASS][E6][E_Offset],offsets[COMPASS][E6][U_Offset]))
 
   if QZSS in offsets:
     Az_html_file.write("<h3>QZSS</h3>")
     if L1 in offsets[QZSS]:
-      Az_html_file.write("L1: N: {}  E: {} U: {}<br>".format(offsets[QZSS][L1][N_Offset],offsets[QZSS][L1][E_Offset],offsets[QZSS][L1][U_Offset]))
+      Az_html_file.write("L1:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L1][N_Offset],offsets[QZSS][L1][E_Offset],offsets[QZSS][L1][U_Offset]))
 
     if L2 in offsets[QZSS]:
-      Az_html_file.write("L2: N: {}  E: {} U: {}<br>".format(offsets[QZSS][L2][N_Offset],offsets[QZSS][L2][E_Offset],offsets[QZSS][L2][U_Offset]))
+      Az_html_file.write("L2:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L2][N_Offset],offsets[QZSS][L2][E_Offset],offsets[QZSS][L2][U_Offset]))
 
     if L5 in offsets[QZSS]:
-      Az_html_file.write("L5: N: {}  E: {} U: {}<br>".format(offsets[QZSS][L5][N_Offset],offsets[QZSS][L5][E_Offset],offsets[QZSS][L5][U_Offset]))
+      Az_html_file.write("L5:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L5][N_Offset],offsets[QZSS][L5][E_Offset],offsets[QZSS][L5][U_Offset]))
 
     if LEX in offsets[QZSS]:
-      Az_html_file.write("LEX: N: {}  E: {} U: {}<br>".format(offsets[QZSS][LEX][N_Offset],offsets[QZSS][LEX][E_Offset],offsets[QZSS][LEX][U_Offset]))
+      Az_html_file.write("LEX: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][LEX][N_Offset],offsets[QZSS][LEX][E_Offset],offsets[QZSS][LEX][U_Offset]))
 
   if SBAS in offsets:
     Az_html_file.write("<h3>SBAS</h3>")
     if L1 in offsets[SBAS]:
-      Az_html_file.write("L1: N: {}  E: {} U: {}<br>".format(offsets[SBAS][L1][N_Offset],offsets[SBAS][L1][E_Offset],offsets[SBAS][L1][U_Offset]))
+      Az_html_file.write("L1: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[SBAS][L1][N_Offset],offsets[SBAS][L1][E_Offset],offsets[SBAS][L1][U_Offset]))
 
     if L5 in offsets[SBAS]:
-      Az_html_file.write("L5: N: {}  E: {} U: {}<br>".format(offsets[SBAS][L5][N_Offset],offsets[SBAS][L5][E_Offset],offsets[SBAS][L5][U_Offset]))
+      Az_html_file.write("L5: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[SBAS][L5][N_Offset],offsets[SBAS][L5][E_Offset],offsets[SBAS][L5][U_Offset]))
 
   if IRNSS in offsets:
     Az_html_file.write("<h3>IRNSS</h3>")
     if L5 in offsets[IRNSS]:
-      Az_html_file.write("L5: N: {}  E: {} U: {}<br>".format(offsets[IRNSS][L5][N_Offset],offsets[IRNSS][L5][E_Offset],offsets[IRNSS][L5][U_Offset]))
+      Az_html_file.write("L5: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[IRNSS][L5][N_Offset],offsets[IRNSS][L5][E_Offset],offsets[IRNSS][L5][U_Offset]))
+
+#  Az_html_file.write('</div><div class="column">Bands')
 
 
+  Az_html_file.write("<br/><hr/><h2>Band</h2><pre>")
+
+  if (GPS in offsets and  L1 in offsets[GPS]) or \
+     (GLONASS in offsets and L1 in offsets[GLONASS]) or \
+     (QZSS in offsets and L1 in offsets[QZSS]) or \
+     (SBAS in offsets and L1 in offsets[SBAS]):
+
+     Az_html_file.write("<h3>L1</h3>")
+     if GPS in offsets and  L1 in offsets[GPS]:
+         Az_html_file.write("GPS:     N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L1][N_Offset],offsets[GPS][L1][E_Offset],offsets[GPS][L1][U_Offset]))
+     if GLONASS in offsets and L1 in offsets[GLONASS]:
+         Az_html_file.write("GLONASS: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GLONASS][L1][N_Offset],offsets[GLONASS][L1][E_Offset],offsets[GLONASS][L1][U_Offset]))
+     if QZSS in offsets and L1 in offsets[QZSS]:
+         Az_html_file.write("QZSS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L1][N_Offset],offsets[QZSS][L1][E_Offset],offsets[QZSS][L1][U_Offset]))
+     if SBAS in offsets and L1 in offsets[SBAS]:
+         Az_html_file.write("SBAS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[SBAS][L1][N_Offset],offsets[SBAS][L1][E_Offset],offsets[SBAS][L1][U_Offset]))
+
+
+  if GPS in offsets and L2 in offsets[GPS] or \
+    GLONASS in offsets and L2 in offsets[GLONASS] or \
+    QZSS in offsets and L2 in offsets[QZSS]:
+
+    Az_html_file.write("<h3>L2</h3>")
+    if GPS in offsets and L2 in offsets[GPS]:
+        Az_html_file.write("GPS:     N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L2][N_Offset],offsets[GPS][L2][E_Offset],offsets[GPS][L2][U_Offset]))
+    if GLONASS in offsets and L2 in offsets[GLONASS]:
+        Az_html_file.write("GLONASS: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GLONASS][L2][N_Offset],offsets[GLONASS][L2][E_Offset],offsets[GLONASS][L2][U_Offset]))
+    if QZSS in offsets and L2 in offsets[QZSS]:
+        Az_html_file.write("QZSS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L2][N_Offset],offsets[QZSS][L2][E_Offset],offsets[QZSS][L2][U_Offset]))
+
+
+  if GPS in offsets and  L5 in offsets[GPS] or \
+     QZSS in offsets and L5 in offsets[QZSS] or \
+     SBAS in offsets and L5 in offsets[SBAS] or \
+     IRNSS in offsets and L5 in offsets[IRNSS]:
+
+    Az_html_file.write("<h3>L5</h3>")
+    if GPS in offsets and  L5 in offsets[GPS]:
+        Az_html_file.write("GPS:     N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GPS][L5][N_Offset],offsets[GPS][L5][E_Offset],offsets[GPS][L5][U_Offset]))
+    if QZSS in offsets and L5 in offsets[QZSS]:
+        Az_html_file.write("QZSS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][L5][N_Offset],offsets[QZSS][L5][E_Offset],offsets[QZSS][L5][U_Offset]))
+    if SBAS in offsets and L5 in offsets[SBAS]:
+        Az_html_file.write("SBAS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[SBAS][L5][N_Offset],offsets[SBAS][L5][E_Offset],offsets[SBAS][L5][U_Offset]))
+    if IRNSS in offsets and L5 in offsets[IRNSS]:
+        Az_html_file.write("IRNSS:   N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[IRNSS][L5][N_Offset],offsets[IRNSS][L5][E_Offset],offsets[IRNSS][L5][U_Offset]))
+
+
+
+
+  if GALILEO in offsets and E1 in offsets[GALILEO] or \
+     COMPASS in offsets and E1 in offsets[COMPASS]:
+
+     Az_html_file.write("<h3>E1</h3>")
+     if GALILEO in offsets and E1 in offsets[GALILEO]:
+        Az_html_file.write("GALILEO: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E1][N_Offset],offsets[GALILEO][E1][E_Offset],offsets[GALILEO][E1][U_Offset]))
+     if COMPASS in offsets and E1 in offsets[COMPASS]:
+        Az_html_file.write("BeiDou:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E1][N_Offset],offsets[COMPASS][E1][E_Offset],offsets[COMPASS][E1][U_Offset]))
+
+
+  if COMPASS in offsets and E2 in offsets[COMPASS]:
+     Az_html_file.write("<h3>E2</h3>")
+     if COMPASS in offsets and E2 in offsets[COMPASS]:
+         Az_html_file.write("BeiDou:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E2][N_Offset],offsets[COMPASS][E2][E_Offset],offsets[COMPASS][E2][U_Offset]))
+
+  if GALILEO in offsets and E5 in offsets[GALILEO]:
+     Az_html_file.write("<h3>E5</h3>")
+     if GALILEO in offsets and E5 in offsets[GALILEO]:
+         Az_html_file.write("GALILEO: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5][N_Offset],offsets[GALILEO][E5][E_Offset],offsets[GALILEO][E5][U_Offset]))
+
+
+  if GALILEO in offsets and E5a in offsets[GALILEO]:
+     Az_html_file.write("<h3>E5a</h3>")
+     if GALILEO in offsets and E5a in offsets[GALILEO]:
+         Az_html_file.write("GALILEO: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5a][N_Offset],offsets[GALILEO][E5a][E_Offset],offsets[GALILEO][E5a][U_Offset]))
+
+  if GALILEO in offsets and E5b in offsets[GALILEO] or \
+     COMPASS in offsets and E5b in offsets[COMPASS]:
+
+     Az_html_file.write("<h3>E5b</h3>")
+     if GALILEO in offsets and E5b in offsets[GALILEO]:
+         Az_html_file.write("GALILEO: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E5b][N_Offset],offsets[GALILEO][E5b][E_Offset],offsets[GALILEO][E5b][U_Offset]))
+     if COMPASS in offsets and E5b in offsets[COMPASS]:
+         Az_html_file.write("BeiDou:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E5b][N_Offset],offsets[COMPASS][E5b][E_Offset],offsets[COMPASS][E5b][U_Offset]))
+
+
+  if GALILEO in offsets and E6 in offsets[GALILEO] or  \
+     COMPASS in offsets and E6 in offsets[COMPASS]:
+
+     Az_html_file.write("<h3>E6</h3>")
+     if GALILEO in offsets and E6 in offsets[GALILEO]:
+         Az_html_file.write("GALILEO: N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[GALILEO][E6][N_Offset],offsets[GALILEO][E6][E_Offset],offsets[GALILEO][E6][U_Offset]))
+     if COMPASS in offsets and E6 in offsets[COMPASS]:
+         Az_html_file.write("BeiDou:  N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[COMPASS][E6][N_Offset],offsets[COMPASS][E6][E_Offset],offsets[COMPASS][E6][U_Offset]))
+
+  if QZSS in offsets and LEX in offsets[QZSS]:
+     Az_html_file.write("<h3>LEX</h3>")
+     if QZSS in offsets and LEX in offsets[QZSS]:
+         Az_html_file.write("QZSS:    N: {: .2f}  E: {: .2f}  U: {: .2f}<br>".format(offsets[QZSS][LEX][N_Offset],offsets[QZSS][LEX][E_Offset],offsets[QZSS][LEX][U_Offset]))
+
+  Az_html_file.write("<br/><hr/></pre>")
+
+#  Az_html_file.write('</div>')
 
 
 
