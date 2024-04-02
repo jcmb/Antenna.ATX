@@ -691,7 +691,7 @@ def dump_NEE_Offsets(Az_html_file, offsets):
 
 
     #  Az_html_file.write('</div><div class="column">Bands')
-    Az_html_file.write('</td><td style="vertical-align:top;font-family: monospace;>"')
+    Az_html_file.write('</td><td style="vertical-align:top;font-family: monospace;>">')
 
     if (
         (GPS in offsets and L1 in offsets[GPS])
