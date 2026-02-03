@@ -1,0 +1,8 @@
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=150
+max-module-lines=2000
+
+[MESSAGES CONTROL]
+# C0103: invalid-name
+disable=C0103, C0209, C0114, C0115, C0116, R0902, R0912, R0915, R0916, R1731, R1735, W0702, W0719, E0401, E0413

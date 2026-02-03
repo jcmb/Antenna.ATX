@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
 import fileinput
-from pprint import pprint
+from pprint import pprint # pylint: disable=W0611
+
 import sys
 from datetime import datetime, UTC
 
@@ -10,13 +11,16 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import tempfile
-import base64
+#import tempfile
+#import base64
+
+#TODO: Add doc strings and turn back on C0116
 
 # pprint=pprint.PrettyPrinter(stream=sys.stderr)
 
 from JCMBSoftPyLib import HTML_Unit
 
+# pylint: disable=W0105
 """
 Record indicating the start of a new     |3X,A1,I2,54X|
  |                    | frequency section. The satellite system  |            |
@@ -142,7 +146,7 @@ def safe_filename(filename):
     return result
 
 
-def plot_polar_contour(Title, values, azimuths, zeniths, range):
+def plot_polar_contour(Title, values, azimuths, zeniths, data_range):
     """Plot a polar contour plot, with 0 degrees at the North.
 
     Arguments:
@@ -183,12 +187,12 @@ def plot_polar_contour(Title, values, azimuths, zeniths, range):
     ax.set_theta_zero_location("N")
     ax.set_theta_direction("clockwise")
     plt.title(Title)
-    #    plt.ylim(range)
+    #    plt.ylim(data_range)
 
-    # Todo
+    # To do
     #    ax.set_rgrids([30,60],labels=["30","60"],angle=[0,0],fmt=None,visible=False)
     #    ax.set_rgrids([30.0,60.0],angle=[45,135],fmt=None)
-    cax = plt.contourf(theta, r, values, 30, levels=range)
+    cax = plt.contourf(theta, r, values, 30, levels=data_range)
     cb = fig.colorbar(cax)
     cb.set_label("Bias (mm)")
 
@@ -215,10 +219,10 @@ def create_mean_plot(antennaName, System, Elev_Corrections, Elev_Names):
     plt.xlim(xplot_range)
 
     if len(Elev_Corrections) == 0:
-        returrn("")
+        return ""
 
     if len(Elev_Corrections[0]) == 0:
-        returrn("")
+        return ""
 
     for Item in Elev_Corrections[0]:
         Elev_Labels.append(Item[0])
@@ -274,8 +278,8 @@ def create_az_plot(antennaName, bandName, Az_Elev_Correction):
     #    pprint(antennaName)
     #    pprint(bandName)
     Elev_Labels = []
-    L1_values = []
-    L2_values = []
+#    L1_values = []
+#    L2_values = []
 
     plt.figure(figsize=(8, 6), dpi=100)
     plt.ylabel("Bias (mm)")
@@ -334,8 +338,8 @@ def create_az_plot(antennaName, bandName, Az_Elev_Correction):
 def create_az_delta_plot(antennaName, Band, Az_Elev_Correction):
 
     Elev_Labels = []
-    L1_values = []
-    L2_values = []
+#    L1_values = []
+#    L2_values = []
 
     plt.figure(figsize=(8, 6), dpi=100)
     plt.ylabel("Bias from mean (mm)")
@@ -940,7 +944,7 @@ def dump_NEE_Offsets(Az_html_file, offsets):
 
 def Az_Link(Antenna, Az_filename, System):
     SystemName = SYSTEM_NAMES[System]
-    if System in Antenna.APC_Offsets:
+    if System in Antenna.APC_Offsets:  # pylint: disable=R1705
         return f'<a target="_blank" href="{Az_filename}#{SystemName}">Azimuth</a>'
     else:
         return ""
@@ -948,7 +952,8 @@ def Az_Link(Antenna, Az_filename, System):
 
 def output_antenna_details(Antenna):
     if not Antenna.Type in SV_Types:
-        #        print ("Type: {} Serial: {} Bands: {} Freqs: {} GPS Antennas: {} GLONASS Antennas: {}".format(Type,Serial,len(APC_Offsets[SV_System]),Num_Freqs,GPS_Antennas,GLO_Antennas))
+        #        print ("Type: {} Serial: {} Bands: {} Freqs: {} GPS Antennas: {} GLONASS Antennas: {}".
+        #    format(Type,Serial,len(APC_Offsets[SV_System]),Num_Freqs,GPS_Antennas,GLO_Antennas))
 
         if GPS not in Antenna.APC_Offsets:
             #            pprint(Antenna.APC_Offsets)
@@ -957,7 +962,7 @@ def output_antenna_details(Antenna):
         Az_html_file = None
         Az_filename = safe_filename(Antenna.Type) + ".html"
         #        print(Az_filename)
-        Az_html_file = open(Az_filename, "w")
+        Az_html_file = open(Az_filename, "w",encoding="utf-8") # pylint: disable=R1732
         #        pprint(Az_html_file)
         HTML_Unit.output_html_header(
             Az_html_file, "Antenna information for " + Antenna.Type
@@ -1062,11 +1067,13 @@ def output_antenna_details(Antenna):
         #                 GPS_Offsets_Txt,GPS_L1_Offsets_Txt,GPS_L2_Offsets_Txt,
         #                 GLO_Offsets_Txt,GLO_L1_Offsets_Txt,GLO_L2_Offsets_Txt])
 
-        if Az_html_file != None:
+        if Az_html_file is None:
             HTML_Unit.output_html_footer(Az_html_file, [])
 
             Az_html_file.close()
             Az_html_file = None
+
+    return None
 
 
 class GNSSAntenna:
@@ -1118,7 +1125,7 @@ class GNSSAntenna:
             self.GLO_Antennas = int(line[GLO_Cal_Antennas_Length:60], base=10)
         #        print GLO_Antennas
         elif line.find("# Number of Individual GLO-Calibrations:") == 0:
-            if self.GLO_Antennas == None:
+            if self.GLO_Antennas is None:
                 self.GLO_Antennas = self.GPS_Antennas
                 # Handle the antennas with a generic antenna total comment and GLONASS
 
@@ -1182,17 +1189,17 @@ class GNSSAntenna:
                 if band in self.APC_Offsets[System]:
                     Offsets.append(self.APC_Offsets[System][band][NO_AZ])
                     bands_included.append(bands_names[band_number])
-                    band_name = bands_names[band_number]
+#                    band_name = bands_names[band_number]
                     band_number += 1
 
             plot_name = create_mean_plot(self.Type, System, Offsets, bands_names)
             Az_file.write("<H3>{}</H3>\n".format(SYSTEM_NAMES[System]))
             Az_file.write(
-                '<img src="{}" alt={}>\n'.format(plot_name, plot_name, self.Type)
+                '<img src="{}" alt={}>\n'.format(plot_name, plot_name) # pylint: disable=W1308
             )
 
     def plot_SV_System_Azimuth(self, Az_html_file, System, bands, bands_names):
-        Offsets = []
+#        Offsets = []
         #        print(f"Type: {System}")
 
         if System in self.APC_Offsets:
@@ -1287,7 +1294,7 @@ def main():
     In_Antenna = False
     In_APC_Offsets = False
     Antenna = None
-    DAZI = None
+#    DAZI = None
 
     HTML_Unit.output_html_header(sys.stdout, "Antenna information")
     HTML_Unit.output_html_body(sys.stdout)
@@ -1321,11 +1328,11 @@ def main():
             #      print "Start"
             Antenna = GNSSAntenna()
 
-            if In_Antenna:
+            if In_Antenna:  # pylint: disable=R1720
                 raise Exception("Got start of antenna while in antenna")
             else:
                 In_Antenna = True
-                DAZI = None
+#                DAZI = None
 
         if Record_Type == "END OF ANTENNA":
             if In_Antenna:
