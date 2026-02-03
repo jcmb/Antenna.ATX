@@ -3,7 +3,7 @@
 import fileinput
 from pprint import pprint
 import sys
-import datetime
+from datetime import datetime, UTC
 
 import numpy as np
 import matplotlib
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import tempfile
 import base64
 
-#pprint=pprint.PrettyPrinter(stream=sys.stderr)
+# pprint=pprint.PrettyPrinter(stream=sys.stderr)
 
 from JCMBSoftPyLib import HTML_Unit
 
@@ -271,8 +271,8 @@ def create_mean_plot(antennaName, System, Elev_Corrections, Elev_Names):
 
 def create_az_plot(antennaName, bandName, Az_Elev_Correction):
 
-#    pprint(antennaName)
-#    pprint(bandName)
+    #    pprint(antennaName)
+    #    pprint(bandName)
     Elev_Labels = []
     L1_values = []
     L2_values = []
@@ -477,12 +477,8 @@ def dump_NEE_Offsets(Az_html_file, offsets):
         Az_html_file,
         "Antenna_Offsets",
         "Antenna Offsets",
-        [
-            "SV System",
-            "Bands"
-        ],
+        ["SV System", "Bands"],
     )
-
 
     Az_html_file.write('<tr><td style="vertical-align:top;font-family: monospace;">')
 
@@ -688,8 +684,6 @@ def dump_NEE_Offsets(Az_html_file, offsets):
                     offsets[SBAS][L5][U_Offset],
                 )
             )
-
-
 
     #  Az_html_file.write('</div><div class="column">Bands')
     Az_html_file.write('</td><td style="vertical-align:top;font-family: monospace;">')
@@ -943,28 +937,28 @@ def dump_NEE_Offsets(Az_html_file, offsets):
 
 #  Az_html_file.write('</div>')
 
-def Az_Link(Antenna,Az_filename,System):
-    SystemName=SYSTEM_NAMES[System]
+
+def Az_Link(Antenna, Az_filename, System):
+    SystemName = SYSTEM_NAMES[System]
     if System in Antenna.APC_Offsets:
-        return (f'<a target="_blank" href="{Az_filename}#{SystemName}">Azimuth</a>')
+        return f'<a target="_blank" href="{Az_filename}#{SystemName}">Azimuth</a>'
     else:
-        return ("")
+        return ""
+
 
 def output_antenna_details(Antenna):
     if not Antenna.Type in SV_Types:
         #        print ("Type: {} Serial: {} Bands: {} Freqs: {} GPS Antennas: {} GLONASS Antennas: {}".format(Type,Serial,len(APC_Offsets[SV_System]),Num_Freqs,GPS_Antennas,GLO_Antennas))
 
         if GPS not in Antenna.APC_Offsets:
-#            pprint(Antenna.APC_Offsets)
-            return None # ignore the Antennas without GPS.
-
-
+            #            pprint(Antenna.APC_Offsets)
+            return None  # ignore the Antennas without GPS.
 
         Az_html_file = None
         Az_filename = safe_filename(Antenna.Type) + ".html"
-#        print(Az_filename)
+        #        print(Az_filename)
         Az_html_file = open(Az_filename, "w")
-#        pprint(Az_html_file)
+        #        pprint(Az_html_file)
         HTML_Unit.output_html_header(
             Az_html_file, "Antenna information for " + Antenna.Type
         )
@@ -974,74 +968,92 @@ def output_antenna_details(Antenna):
         dump_NEE_Offsets(Az_html_file, Antenna.NEE_Offsets)
         Az_html_file.write("\n")
 
-
-        HTML_Unit.output_table_row(sys.stdout,
-            [f'<a target="_blank" href="{Az_filename}">{Antenna.Type}</a>',
+        HTML_Unit.output_table_row(
+            sys.stdout,
+            [
+                f'<a target="_blank" href="{Az_filename}">{Antenna.Type}</a>',
                 len(Antenna.APC_Offsets[GPS]),
                 Antenna.Num_Freqs,
                 Antenna.GPS_Antennas,
-                Az_Link(Antenna,Az_filename,GPS),
-                Az_Link(Antenna,Az_filename,GLONASS),
-                Az_Link(Antenna,Az_filename,GALILEO),
-                Az_Link(Antenna,Az_filename,COMPASS),
-                Az_Link(Antenna,Az_filename,QZSS),
-                Az_Link(Antenna,Az_filename,SBAS),
-                Az_Link(Antenna,Az_filename,IRNSS)
-                ])
+                Az_Link(Antenna, Az_filename, GPS),
+                Az_Link(Antenna, Az_filename, GLONASS),
+                Az_Link(Antenna, Az_filename, GALILEO),
+                Az_Link(Antenna, Az_filename, COMPASS),
+                Az_Link(Antenna, Az_filename, QZSS),
+                Az_Link(Antenna, Az_filename, SBAS),
+                Az_Link(Antenna, Az_filename, IRNSS),
+            ],
+        )
 
-
-        Az_html_file.write('<h1>Means</h1>\n')
-
-
-        if GPS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,GPS, [L1, L2, L5], ["L1", "L2", "L5"])
-
-        if GLONASS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,GLONASS, [L1, L2], ["L1", "L2"])
-
-        if GALILEO in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,GALILEO, [E1, E5a, E5b, E5, E6], ["E1", "E5a","E5b", "E5", "E6"])
-
-        if COMPASS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,COMPASS, [E1, E2, E5b, E6], ["E1", "E2","E5b", "E6"])
-
-        if QZSS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,QZSS, [L1, L2, L5], ["L1", "L2", "L5"])
-
-        if SBAS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,SBAS, [L1, L5], ["L1", "L5"])
-
-        if IRNSS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_means(Az_html_file,IRNSS, [L5], ["L5"])
-
-
-
-
-        Az_html_file.write('<h1>Azimuths</h1>\n')
-
+        Az_html_file.write("<h1>Means</h1>\n")
 
         if GPS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file, GPS, [L1, L2, L5], ["L1", "L2", "L5"])
+            Antenna.plot_SV_System_means(
+                Az_html_file, GPS, [L1, L2, L5], ["L1", "L2", "L5"]
+            )
 
         if GLONASS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file, GLONASS, [L1, L2], ["L1", "L2"])
+            Antenna.plot_SV_System_means(Az_html_file, GLONASS, [L1, L2], ["L1", "L2"])
 
         if GALILEO in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file,GALILEO, [E1, E5a, E5b, E5, E6], ["E1", "E5a","E5b", "E5", "E6"])
+            Antenna.plot_SV_System_means(
+                Az_html_file,
+                GALILEO,
+                [E1, E5a, E5b, E5, E6],
+                ["E1", "E5a", "E5b", "E5", "E6"],
+            )
 
         if COMPASS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file,COMPASS, [E1, E2, E5b, E6], ["E1", "E2","E5b", "E6"])
+            Antenna.plot_SV_System_means(
+                Az_html_file, COMPASS, [E1, E2, E5b, E6], ["E1", "E2", "E5b", "E6"]
+            )
 
         if QZSS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file,QZSS, [L1, L2, L5], ["L1", "L2", "L5"])
+            Antenna.plot_SV_System_means(
+                Az_html_file, QZSS, [L1, L2, L5], ["L1", "L2", "L5"]
+            )
 
         if SBAS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file,SBAS, [L1, L5], ["L1", "L5"])
+            Antenna.plot_SV_System_means(Az_html_file, SBAS, [L1, L5], ["L1", "L5"])
 
         if IRNSS in Antenna.APC_Offsets:
-            Antenna.plot_SV_System_Azimuth(Az_html_file,IRNSS, [L5], ["L5"])
+            Antenna.plot_SV_System_means(Az_html_file, IRNSS, [L5], ["L5"])
 
+        Az_html_file.write("<h1>Azimuths</h1>\n")
 
+        if GPS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(
+                Az_html_file, GPS, [L1, L2, L5], ["L1", "L2", "L5"]
+            )
+
+        if GLONASS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(
+                Az_html_file, GLONASS, [L1, L2], ["L1", "L2"]
+            )
+
+        if GALILEO in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(
+                Az_html_file,
+                GALILEO,
+                [E1, E5a, E5b, E5, E6],
+                ["E1", "E5a", "E5b", "E5", "E6"],
+            )
+
+        if COMPASS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(
+                Az_html_file, COMPASS, [E1, E2, E5b, E6], ["E1", "E2", "E5b", "E6"]
+            )
+
+        if QZSS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(
+                Az_html_file, QZSS, [L1, L2, L5], ["L1", "L2", "L5"]
+            )
+
+        if SBAS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(Az_html_file, SBAS, [L1, L5], ["L1", "L5"])
+
+        if IRNSS in Antenna.APC_Offsets:
+            Antenna.plot_SV_System_Azimuth(Az_html_file, IRNSS, [L5], ["L5"])
 
         # Really need to split this one up, it is super ugly
 
@@ -1170,62 +1182,58 @@ class GNSSAntenna:
                 if band in self.APC_Offsets[System]:
                     Offsets.append(self.APC_Offsets[System][band][NO_AZ])
                     bands_included.append(bands_names[band_number])
-                    band_name=bands_names[band_number]
+                    band_name = bands_names[band_number]
                     band_number += 1
 
-
-
             plot_name = create_mean_plot(self.Type, System, Offsets, bands_names)
-            Az_file.write('<H3>{}</H3>\n'.format(SYSTEM_NAMES[System]))
-            Az_file.write('<img src="{}" alt={}>\n'.format(plot_name, plot_name,self.Type))
-
+            Az_file.write("<H3>{}</H3>\n".format(SYSTEM_NAMES[System]))
+            Az_file.write(
+                '<img src="{}" alt={}>\n'.format(plot_name, plot_name, self.Type)
+            )
 
     def plot_SV_System_Azimuth(self, Az_html_file, System, bands, bands_names):
         Offsets = []
-#        print(f"Type: {System}")
+        #        print(f"Type: {System}")
 
         if System in self.APC_Offsets:
             band_number = 0
             systemName = SYSTEM_NAMES[System]
             bands_included = []
-            Az_html_file.write('<p/>\n')
-            Az_html_file.write('<p/>\n')
+            Az_html_file.write("<p/>\n")
+            Az_html_file.write("<p/>\n")
             HTML_Unit.output_table_header(
                 Az_html_file,
                 systemName,
-                f'<h2>{systemName}</h2><br/>\n',
-                [
-                    "Bias",
-                    "Delta"
-                ],
+                f"<h2>{systemName}</h2><br/>\n",
+                ["Bias", "Delta"],
             )
 
-
-
             for band in bands:
-#                pprint(self.APC_Offsets)
-#                pprint(self.APC_Offsets[0])
-#                pprint(System)
-#                pprint(self.APC_Offsets[System])
+                #                pprint(self.APC_Offsets)
+                #                pprint(self.APC_Offsets[0])
+                #                pprint(System)
+                #                pprint(self.APC_Offsets[System])
 
                 if band in self.APC_Offsets[System]:
                     if len(self.APC_Offsets[System][band]) == 1:
                         continue
 
-
-
                     bands_included.append(bands_names[band_number])
                     band_name = bands_names[band_number]
                     band_number += 1
 
-                    Az_html_file.write(f'<tr><td colspan="2" style="text-align: center;"><h3>{systemName}-{band_name}</h3></td></tr>\n')
-                    Az_html_file.write('<tr>')
+                    Az_html_file.write(
+                        f'<tr><td colspan="2" style="text-align: center;"><h3>{systemName}-{band_name}</h3></td></tr>\n'
+                    )
+                    Az_html_file.write("<tr>")
 
                     #          pprint(APC_Offsets[GPS][L1])
                     Az_html_file.write(
                         '<td><img src="{}" alt="{}"></td>'.format(
                             create_az_plot(
-                                self.Type, f"{systemName}-{band_name}", self.APC_Offsets[System][band]
+                                self.Type,
+                                f"{systemName}-{band_name}",
+                                self.APC_Offsets[System][band],
                             ),
                             f"{systemName}-{band_name}",
                         )
@@ -1234,19 +1242,23 @@ class GNSSAntenna:
                     Az_html_file.write(
                         '<td><img src="{}" alt="{}"></td>'.format(
                             create_az_delta_plot(
-                              self.Type,  f"{systemName}-{band_name}", self.APC_Offsets[System][band]
+                                self.Type,
+                                f"{systemName}-{band_name}",
+                                self.APC_Offsets[System][band],
                             ),
                             f"{systemName}-{band_name}",
                         )
                     )
 
-                    Az_html_file.write('</tr><tr>')
+                    Az_html_file.write("</tr><tr>")
 
                     Az_html_file.write("\n")
                     Az_html_file.write(
                         '<td><img src="{}" alt="{}"></td>'.format(
                             create_plot_radial(
-                                self.Type, f"{systemName}-{band_name}", self.APC_Offsets[System][band]
+                                self.Type,
+                                f"{systemName}-{band_name}",
+                                self.APC_Offsets[System][band],
                             ),
                             f"Radial {systemName}-{band_name}",
                         )
@@ -1255,14 +1267,17 @@ class GNSSAntenna:
                     Az_html_file.write(
                         '<td><img src="{}" alt="{}"></td>'.format(
                             create_plot_delta_radial(
-                                self.Type, f"{systemName}-{band_name}", self.APC_Offsets[System][band]
+                                self.Type,
+                                f"{systemName}-{band_name}",
+                                self.APC_Offsets[System][band],
                             ),
                             f"Radial {systemName}-{band_name}",
                         )
                     )
-                    Az_html_file.write('</tr>\n')
+                    Az_html_file.write("</tr>\n")
 
             HTML_Unit.output_table_footer(Az_html_file)
+
 
 #           plot_name=create_mean_plot (Type,"GPS",Offsets,["L1","L2","L5"])
 
@@ -1292,17 +1307,16 @@ def main():
             "BDS",
             "QZSS",
             "SBAS",
-            "IRNSS"
-
+            "IRNSS",
         ],
     )
     #       HTML_Unit.output_table_row(sys.stdout,[defect,defects_Desc[defect],Versions_Str])
 
     for line in fileinput.input():
         line = line.rstrip()
-#        print (line)
+        #        print (line)
         Record_Type = line[60:]
-#        print (Record_Type,"*")
+        #        print (Record_Type,"*")
         if Record_Type == "START OF ANTENNA":
             #      print "Start"
             Antenna = GNSSAntenna()
@@ -1316,7 +1330,7 @@ def main():
         if Record_Type == "END OF ANTENNA":
             if In_Antenna:
                 In_Antenna = False
-#                pprint(Antenna)
+                #                pprint(Antenna)
                 output_antenna_details(Antenna)
             else:
                 raise Exception("Got end of antenna while not in antenna")
