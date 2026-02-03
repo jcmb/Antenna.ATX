@@ -3,6 +3,7 @@
 import fileinput
 from pprint import pprint
 import sys
+import datetime
 
 import numpy as np
 import matplotlib
@@ -12,7 +13,7 @@ import matplotlib.pyplot as plt
 import tempfile
 import base64
 
-# pprint=pprint.PrettyPrinter(stream=sys.stderr)
+#pprint=pprint.PrettyPrinter(stream=sys.stderr)
 
 from JCMBSoftPyLib import HTML_Unit
 
@@ -953,6 +954,12 @@ def output_antenna_details(Antenna):
     if not Antenna.Type in SV_Types:
         #        print ("Type: {} Serial: {} Bands: {} Freqs: {} GPS Antennas: {} GLONASS Antennas: {}".format(Type,Serial,len(APC_Offsets[SV_System]),Num_Freqs,GPS_Antennas,GLO_Antennas))
 
+        if GPS not in Antenna.APC_Offsets:
+#            pprint(Antenna.APC_Offsets)
+            return None # ignore the Antennas without GPS.
+
+
+
         Az_html_file = None
         Az_filename = safe_filename(Antenna.Type) + ".html"
 #        print(Az_filename)
@@ -966,6 +973,7 @@ def output_antenna_details(Antenna):
         Az_html_file.write("\n")
         dump_NEE_Offsets(Az_html_file, Antenna.NEE_Offsets)
         Az_html_file.write("\n")
+
 
         HTML_Unit.output_table_row(sys.stdout,
             [f'<a target="_blank" href="{Az_filename}">{Antenna.Type}</a>',
@@ -1268,6 +1276,7 @@ def main():
 
     HTML_Unit.output_html_header(sys.stdout, "Antenna information")
     HTML_Unit.output_html_body(sys.stdout)
+    sys.stdout.write("<br/>Created: {}".format(datetime.now(UTC)))
     HTML_Unit.output_table_header(
         sys.stdout,
         "Antenna_Information",
@@ -1291,9 +1300,9 @@ def main():
 
     for line in fileinput.input():
         line = line.rstrip()
-        #    print line
+#        print (line)
         Record_Type = line[60:]
-        #    print Record_Type,"*"
+#        print (Record_Type,"*")
         if Record_Type == "START OF ANTENNA":
             #      print "Start"
             Antenna = GNSSAntenna()
@@ -1307,6 +1316,7 @@ def main():
         if Record_Type == "END OF ANTENNA":
             if In_Antenna:
                 In_Antenna = False
+#                pprint(Antenna)
                 output_antenna_details(Antenna)
             else:
                 raise Exception("Got end of antenna while not in antenna")
@@ -1375,7 +1385,6 @@ def main():
                 raise Exception("Got NORTH / EAST / UP while not in antenna")
 
     HTML_Unit.output_table_footer(sys.stdout)
-
     HTML_Unit.output_html_footer(sys.stdout, ["Antenna_Information"])
 
 
